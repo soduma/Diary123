@@ -172,7 +172,7 @@
                         <outlet property="confirmButton" destination="fsP-Ky-AkI" id="Jo5-Bz-rKf"/>
                         <outlet property="contentsTextView" destination="VKn-QA-WjI" id="zGr-FZ-m44"/>
                         <outlet property="dateTextField" destination="zgf-d1-IGW" id="MYT-Ki-W5f"/>
-                        <outlet property="titleTextView" destination="3UK-wm-t8V" id="Xgf-ID-00B"/>
+                        <outlet property="titleTextField" destination="3UK-wm-t8V" id="Xgf-ID-00B"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="NKH-zX-ynF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
