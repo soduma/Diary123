@@ -10,16 +10,24 @@ import UIKit
 class ViewController: UIViewController, WriteDiaryViewDelegate {
     func didSelectRegister(diary: Diary) {
         diaryList.append(diary)
+        diaryList = diaryList.sorted(by: {
+            $0.date.compare($1.date) == .orderedDescending
+        })
         collectionView.reloadData()
     }
     
     @IBOutlet var collectionView: UICollectionView!
     
-    private var diaryList = [Diary]()
+    private var diaryList = [Diary]() {
+        didSet {
+            saveDiaryList()
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configureCollectionView()
+        loadDiaryList()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -41,6 +49,34 @@ class ViewController: UIViewController, WriteDiaryViewDelegate {
         formatter.locale = Locale(identifier: "ko_KR")
         return formatter.string(from: date)
     }
+    
+    private func saveDiaryList() {
+        let data = diaryList.map {
+            [
+                "title": $0.title,
+                "contents": $0.contents,
+                "date": $0.date,
+                "isStar": $0.isStar
+            ]
+        }
+        let userDefaults = UserDefaults.standard
+        userDefaults.set(data, forKey: "diaryList")
+    }
+    
+    private func loadDiaryList() {
+        let userDefaults = UserDefaults.standard
+        guard let data = userDefaults.object(forKey: "diaryList") as? [[String: Any]] else { return }
+        diaryList = data.compactMap {
+            guard let title = $0["title"] as? String else { return nil }
+            guard let contents = $0["contents"] as? String else { return nil }
+            guard let date = $0["date"] as? Date else { return nil }
+            guard let isStar = $0["isStar"] as? Bool else { return nil }
+            return Diary(title: title, contents: contents, date: date, isStar: isStar)
+        }
+        diaryList = diaryList.sorted(by: {
+            $0.date.compare($1.date) == .orderedDescending
+        })
+    }
 }
 
 extension ViewController: UICollectionViewDataSource {
@@ -60,6 +96,7 @@ extension ViewController: UICollectionViewDataSource {
 
 extension ViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: (UIScreen.main.bounds.width / 2) - 20, height: 200)
+//        return CGSize(width: (UIScreen.main.bounds.width / 2) - 20, height: 200)
+        return CGSize(width: (collectionView.bounds.width - 30) / 2, height: 200)
     }
 }
