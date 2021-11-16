@@ -100,3 +100,22 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
         return CGSize(width: (collectionView.bounds.width - 30) / 2, height: 200)
     }
 }
+
+extension ViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let viewController = storyboard?.instantiateViewController(withIdentifier: "DetailDiaryViewController") as? DetailDiaryViewController else { return }
+        let diary = diaryList[indexPath.row]
+        viewController.diary = diary
+        viewController.indexpath = indexPath
+        viewController.delegate = self
+        self.navigationController?.pushViewController(viewController, animated: true)
+    }
+}
+
+extension ViewController: DiaryDetailViewDelegate {
+    func didSelectDelete(indexpath: IndexPath) {
+        diaryList.remove(at: indexpath.row)
+        collectionView.deleteItems(at: [indexpath])
+//        collectionView.reloadData()
+    }
+}
