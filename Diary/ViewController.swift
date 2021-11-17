@@ -26,8 +26,10 @@ class ViewController: UIViewController, WriteDiaryViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         configureCollectionView()
         loadDiaryList()
+        
         NotificationCenter.default.addObserver(self, selector: #selector(editDiaryNotification(_:)), name: NSNotification.Name("editDiary"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(starDiaryNotification(_:)), name: NSNotification.Name("starDiary"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(deleteDiaryNotification(_:)), name: NSNotification.Name("deleteDiary"), object: nil)

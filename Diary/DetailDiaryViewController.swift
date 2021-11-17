@@ -51,10 +51,12 @@ class DetailDiaryViewController: UIViewController {
             starButton?.image = UIImage(systemName: "star.fill")
         }
         diary?.isStar = !isStar
-        NotificationCenter.default.post(name: NSNotification.Name("starDiary"),object: [
-                "isStar": diary?.isStar ?? false,
-                "indexPath": indexPath
-            ],
+        NotificationCenter.default.post(
+            name: NSNotification.Name("starDiary"),
+            object: ["diary": diary,
+                     "isStar": diary?.isStar ?? false,
+                     "indexPath": indexPath
+                    ],
             userInfo: nil)
     }
     
