@@ -28,12 +28,23 @@ class ViewController: UIViewController, WriteDiaryViewDelegate {
         super.viewDidLoad()
         configureCollectionView()
         loadDiaryList()
+        NotificationCenter.default.addObserver(self, selector: #selector(editDiaryNotification(_:)), name: NSNotification.Name("editDiary"), object: nil)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let writeDiaryViewController = segue.destination as? WriteDiaryViewController {
             writeDiaryViewController.delegate = self
         }
+    }
+    
+    @objc func editDiaryNotification(_ notification: Notification) {
+        guard let diary = notification.object as? Diary else { return }
+        guard let row = notification.userInfo?["indexPath.row"] as? Int else { return }
+        diaryList[row] = diary
+        diaryList = diaryList.sorted(by: {
+            $0.date.compare($1.date) == .orderedDescending
+        })
+        collectionView.reloadData()
     }
     
     private func configureCollectionView() {
@@ -117,5 +128,9 @@ extension ViewController: DiaryDetailViewDelegate {
         diaryList.remove(at: indexpath.row)
         collectionView.deleteItems(at: [indexpath])
 //        collectionView.reloadData()
+    }
+    
+    func didSelectStar(indexPath: IndexPath, isStar: Bool) {
+        diaryList[indexPath.row].isStar = isStar
     }
 }

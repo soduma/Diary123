@@ -9,6 +9,7 @@ import UIKit
 
 protocol DiaryDetailViewDelegate: AnyObject {
     func didSelectDelete(indexpath: IndexPath)
+    func didSelectStar(indexPath: IndexPath, isStar: Bool)
 }
 
 class DetailDiaryViewController: UIViewController {
@@ -20,6 +21,7 @@ class DetailDiaryViewController: UIViewController {
     var diary: Diary?
     var indexpath: IndexPath?
     weak var delegate: DiaryDetailViewDelegate?
+    var starButton: UIBarButtonItem?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,6 +34,10 @@ class DetailDiaryViewController: UIViewController {
         titleLabel.text =  diary.title
         contentsTextLabel.text = diary.contents
         dateLabel.text = dateToString(date: diary.date)
+        starButton = UIBarButtonItem(image: nil, style: .plain, target: self, action: #selector(tapStarButton))
+        starButton?.image = diary.isStar ? UIImage(systemName: "star.fill") : UIImage(systemName: "star")
+        starButton?.tintColor = .systemOrange
+        navigationItem.rightBarButtonItem = starButton
     }
     
     private func dateToString(date: Date) -> String {
@@ -41,12 +47,45 @@ class DetailDiaryViewController: UIViewController {
         return formatter.string(from: date)
     }
     
+    @objc func tapStarButton() {
+        guard let isStar = diary?.isStar else { return }
+        guard let indexPath = indexpath else { return }
+
+        if isStar {
+            starButton?.image = UIImage(systemName: "star")
+        } else {
+            starButton?.image = UIImage(systemName: "star.fill")
+        }
+        diary?.isStar = !isStar
+        delegate?.didSelectStar(indexPath: indexPath, isStar: diary?.isStar ?? false)
+    }
+    
+    @objc func editDiaryNotification(_ notification: Notification) {
+        guard let diary = notification.object as? Diary else { return }
+        guard let row = notification.userInfo?["indexPath.row"] as? Int else { return }
+        self.diary = diary
+        configureView()
+    }
+    
     @IBAction func tapEditButton(_ sender: UIButton) {
+        guard let viewController = storyboard?.instantiateViewController(withIdentifier: "WriteDiaryViewController") as? WriteDiaryViewController else { return }
+        guard let indexpath = indexpath else { return }
+        guard let diary = diary else { return }
+        viewController.diaryEditorMode = .edit(indexpath, diary)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(editDiaryNotification(_:)),
+                                               name: NSNotification.Name("editDiary"),
+                                               object: nil)
+        navigationController?.pushViewController(viewController, animated: true)
     }
     
     @IBAction func tapDeleteButton(_ sender: UIButton) {
         guard let indexpath = indexpath else { return }
         delegate?.didSelectDelete(indexpath: indexpath)
         navigationController?.popViewController(animated: true)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 }

@@ -93,7 +93,7 @@
         <!--일기 작성-->
         <scene sceneID="ZU6-FS-TCg">
             <objects>
-                <viewController id="rO7-TX-Dhg" customClass="WriteDiaryViewController" customModule="Diary" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="WriteDiaryViewController" id="rO7-TX-Dhg" customClass="WriteDiaryViewController" customModule="Diary" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="P6d-oL-fwz">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -229,6 +229,10 @@
                                             </constraints>
                                         </collectionViewCellContentView>
                                         <size key="customSize" width="414" height="80"/>
+                                        <connections>
+                                            <outlet property="dateLabel" destination="up3-En-KGQ" id="owe-Gj-2rF"/>
+                                            <outlet property="titleLabel" destination="DU8-lb-1tC" id="7xu-xG-1lE"/>
+                                        </connections>
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
@@ -243,6 +247,9 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="phR-Sy-yc2"/>
+                    <connections>
+                        <outlet property="collectionView" destination="EaE-V7-pta" id="QwZ-Cd-DIM"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Zaa-lB-Ah6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
