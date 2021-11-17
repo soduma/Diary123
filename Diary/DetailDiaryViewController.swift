@@ -7,11 +7,6 @@
 
 import UIKit
 
-protocol DiaryDetailViewDelegate: AnyObject {
-    func didSelectDelete(indexpath: IndexPath)
-    func didSelectStar(indexPath: IndexPath, isStar: Bool)
-}
-
 class DetailDiaryViewController: UIViewController {
     
     @IBOutlet var titleLabel: UILabel!
@@ -20,7 +15,6 @@ class DetailDiaryViewController: UIViewController {
     
     var diary: Diary?
     var indexpath: IndexPath?
-    weak var delegate: DiaryDetailViewDelegate?
     var starButton: UIBarButtonItem?
     
     override func viewDidLoad() {
@@ -57,7 +51,11 @@ class DetailDiaryViewController: UIViewController {
             starButton?.image = UIImage(systemName: "star.fill")
         }
         diary?.isStar = !isStar
-        delegate?.didSelectStar(indexPath: indexPath, isStar: diary?.isStar ?? false)
+        NotificationCenter.default.post(name: NSNotification.Name("starDiary"),object: [
+                "isStar": diary?.isStar ?? false,
+                "indexPath": indexPath
+            ],
+            userInfo: nil)
     }
     
     @objc func editDiaryNotification(_ notification: Notification) {
@@ -81,7 +79,7 @@ class DetailDiaryViewController: UIViewController {
     
     @IBAction func tapDeleteButton(_ sender: UIButton) {
         guard let indexpath = indexpath else { return }
-        delegate?.didSelectDelete(indexpath: indexpath)
+        NotificationCenter.default.post(name: NSNotification.Name("deleteDiary"), object: indexpath, userInfo: nil)
         navigationController?.popViewController(animated: true)
     }
     

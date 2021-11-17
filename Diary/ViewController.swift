@@ -29,12 +29,28 @@ class ViewController: UIViewController, WriteDiaryViewDelegate {
         configureCollectionView()
         loadDiaryList()
         NotificationCenter.default.addObserver(self, selector: #selector(editDiaryNotification(_:)), name: NSNotification.Name("editDiary"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(starDiaryNotification(_:)), name: NSNotification.Name("starDiary"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(deleteDiaryNotification(_:)), name: NSNotification.Name("deleteDiary"), object: nil)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let writeDiaryViewController = segue.destination as? WriteDiaryViewController {
             writeDiaryViewController.delegate = self
         }
+    }
+    
+    @objc func deleteDiaryNotification(_ notification: Notification) {
+        guard let indexPath = notification.object as? IndexPath else { return }
+        diaryList.remove(at: indexPath.row)
+        collectionView.deleteItems(at: [indexPath])
+//        collectionView.reloadData()
+    }
+    
+    @objc func starDiaryNotification(_ notification: Notification) {
+        guard let starDiary = notification.object as? [String: Any] else { return }
+        guard let isStar = starDiary["isStar"] as? Bool else { return }
+        guard let indexPath = starDiary["indexPath"] as? IndexPath else { return }
+        diaryList[indexPath.row].isStar = isStar
     }
     
     @objc func editDiaryNotification(_ notification: Notification) {
@@ -118,19 +134,6 @@ extension ViewController: UICollectionViewDelegate {
         let diary = diaryList[indexPath.row]
         viewController.diary = diary
         viewController.indexpath = indexPath
-        viewController.delegate = self
         self.navigationController?.pushViewController(viewController, animated: true)
-    }
-}
-
-extension ViewController: DiaryDetailViewDelegate {
-    func didSelectDelete(indexpath: IndexPath) {
-        diaryList.remove(at: indexpath.row)
-        collectionView.deleteItems(at: [indexpath])
-//        collectionView.reloadData()
-    }
-    
-    func didSelectStar(indexPath: IndexPath, isStar: Bool) {
-        diaryList[indexPath.row].isStar = isStar
     }
 }

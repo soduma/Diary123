@@ -122,14 +122,9 @@ class WriteDiaryViewController: UIViewController {
                 object: diary,
                 userInfo: ["indexPath.row": indexPath.row])
         }
-//        delegate?.didSelectRegister(diary: diary)
         navigationController?.popViewController(animated: true)
     }
-    
-
-
 }
-
 
 extension WriteDiaryViewController: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
