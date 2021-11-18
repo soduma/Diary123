@@ -21,6 +21,7 @@ class DetailDiaryViewController: UIViewController {
         super.viewDidLoad()
         
         configureView()
+        NotificationCenter.default.addObserver(self, selector: #selector(starDiaryNotification(_:)), name: NSNotification.Name("starDiary"), object: nil)
     }
     
     private func configureView() {
@@ -43,7 +44,6 @@ class DetailDiaryViewController: UIViewController {
     
     @objc func tapStarButton() {
         guard let isStar = diary?.isStar else { return }
-        guard let indexPath = indexpath else { return }
 
         if isStar {
             starButton?.image = UIImage(systemName: "star")
@@ -55,14 +55,25 @@ class DetailDiaryViewController: UIViewController {
             name: NSNotification.Name("starDiary"),
             object: ["diary": diary,
                      "isStar": diary?.isStar ?? false,
-                     "indexPath": indexPath
+                     "uuidString": diary?.uuidString
                     ],
             userInfo: nil)
     }
     
+    @objc func starDiaryNotification(_ notification: Notification) {
+        guard let starDiary = notification.object as? [String: Any] else { return }
+        guard let isStar = starDiary["isStar"] as? Bool else { return }
+        guard let uuidString = starDiary["uuidString"] as? String else { return }
+        guard let diary = diary else { return }
+        
+        if diary.uuidString == uuidString {
+            self.diary?.isStar = isStar
+            configureView()
+        }
+    }
+    
     @objc func editDiaryNotification(_ notification: Notification) {
         guard let diary = notification.object as? Diary else { return }
-        guard let row = notification.userInfo?["indexPath.row"] as? Int else { return }
         self.diary = diary
         configureView()
     }
@@ -80,8 +91,8 @@ class DetailDiaryViewController: UIViewController {
     }
     
     @IBAction func tapDeleteButton(_ sender: UIButton) {
-        guard let indexpath = indexpath else { return }
-        NotificationCenter.default.post(name: NSNotification.Name("deleteDiary"), object: indexpath, userInfo: nil)
+        guard let uuidString = diary?.uuidString else { return }
+        NotificationCenter.default.post(name: NSNotification.Name("deleteDiary"), object: uuidString, userInfo: nil)
         navigationController?.popViewController(animated: true)
     }
     
